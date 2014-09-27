@@ -182,9 +182,10 @@ class DebugLevelSettings(object):
     def recognizer(self):
         self.recognizerFactory()
 
-# -- main app --
+# -- main app: example --
 
-if __name__ == '__main__':
+if __name__ == '__main__':    
+    from output import StandardJavaOutputLevelSettings	
     
     processes = []
     processes.append(MLProcess("ls", "ls"))
@@ -193,6 +194,6 @@ if __name__ == '__main__':
 
     # create gui
     root = Tk()
-    app = MultiLaunchUI(root, ml)
+    app = MultiLaunchUI(root, ml, StandardJavaOutputLevelSettings())
     root.mainloop()
 
