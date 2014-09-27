@@ -59,3 +59,20 @@ class OutputLevelSettings(object):
 
     def recognizer(self):
         self.recognizerFactory()
+
+class StandardJavaOutputLevelSettings(OutputLevelSettings):
+	class LevelRecognizer(object):
+		def __init__(self):
+			self.prevLevel = None
+		
+		def recognize(self, line):
+			level = 0
+			if line.startswith("INFO"): level = 1
+			if line.startswith("DEBUG"): level = 2
+			if line.startswith("ERROR"): level = 3
+			if line.startswith("WARN"): level = 4
+			if line.startswith("TRACE"): level = 5
+			return level
+
+	def __init__(self):
+		OutputLevelSettings.__init__(self, {0:'unknown', 1:'info', 2:'debug', 3:'error', 4:'warning', 5:'trace'}, StandardJavaOutputLevelSettings.LevelRecognizer)
