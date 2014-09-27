@@ -21,7 +21,7 @@ class MLProcess(object):
 
     def start(self):
         print "starting %s" % self.command
-        self.p = subprocess.Popen(self.command, shell=True, bufsize=1024*1024, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+        self.p = subprocess.Popen(self.command, shell=True, bufsize=1024*1024, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=False)
         self.stdin = self.p.stdin
         self.stdout = self.p.stdout
         self.stderr = self.p.stderr
