@@ -64,6 +64,7 @@ class LogViewer(object):
         self.dls = debugLevelSettings
         self.frame = frame
         self.instantSearch = instantSearch
+        self.delegate = delegate
         self.frame.columnconfigure(1, weight=1)
         
         row = -1
