@@ -196,3 +196,15 @@ class LogViewer(object):
     
     def onLineAdded(self, line, level):
         self.appendOutput(line, level)
+
+		
+# -- main app: example --
+
+if __name__ == '__main__':    
+    from output import StandardJavaOutputLevelSettings	
+
+    # create gui
+    root = Tk()
+    app = LogViewerUI(root, StandardJavaOutputLevelSettings())
+    root.mainloop()
+
