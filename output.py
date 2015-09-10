@@ -21,7 +21,7 @@ class Output(object):
         
         if regexes is None:
             regexes = []
-        regexes = map(re.compile, regexes)
+        regexes = map(lambda r: re.compile(r) if type(r) == str else r, regexes)
         
         def match(line):
             ret = False

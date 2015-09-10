@@ -103,12 +103,15 @@ class LogViewer(object):
         searchFrame = Frame(self.frame)
         self.regex = StringVar()
         self.regex.trace("w", self.onChangeRegEx)
-        e = Entry(searchFrame, textvariable=self.regex)
+        e = Entry(searchFrame, textvariable=self.regex, relief="solid")
         e.pack(side=LEFT, fill=BOTH, expand=1)
+        self.caseSensitiveSearch = IntVar(0)
+        cb = Checkbutton(searchFrame, text="case-sensitive", variable=self.caseSensitiveSearch)
+        cb.pack(side=LEFT)
         if not self.instantSearch:
             btn = Button(searchFrame, text="search", command=self.searchRegEx)
             btn.pack(side=LEFT)
-        btn = Button(searchFrame, text="locate", command=self.locateFilteredLine)
+        btn = Button(searchFrame, text="view active line in context", command=self.locateFilteredLine)
         btn.pack(side=LEFT)
         searchFrame.grid(row=row, column=1, sticky="NEWS")
         
@@ -148,7 +151,7 @@ class LogViewer(object):
     def getFilteredText(self, onlyLevel=False):
         ''' onlyLevel: if True, only filter by level, otherwise also consider current regex '''
         regex = self.regex.get().strip()
-        regexes = [] if regex == "" or onlyLevel else [regex]
+        regexes = [] if regex == "" or onlyLevel else [re.compile(regex, flags=0 if self.caseSensitiveSearch.get() else re.I)]
         text, lineIndices = self.log.get(self.outputLevels, regexes, returnOriginalLineIndices=True)
         self.filteredLineIndices = lineIndices
         #print "Text:\n", text

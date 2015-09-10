@@ -22,28 +22,37 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 from Tkinter import *
-from ScrolledText import ScrolledText
+havePmw = False
+try:
+    from Pmw import ScrolledText
+    havePmw = True
+except:
+    from ScrolledText import ScrolledText
 from string import ascii_letters, digits, punctuation
 import os
 
 class ScrolledText2(ScrolledText):
     def __init__(self, root, change_hook = None):
         self.root = root
-        ScrolledText.__init__(self,root,wrap=NONE,bd=0,width=80,height=25,undo=1,maxundo=50,padx=0,pady=0,background="white",foreground="black")
+        if havePmw:
+            ScrolledText.__init__(self,root,text_wrap='none',text_padx = 4,text_pady = 4,)
+        else:
+            ScrolledText.__init__(self,root,wrap=NONE,bd=0,width=80,height=25,undo=1,maxundo=50,padx=0,pady=0,background="white",foreground="black")
+
+            # create a popup menu    
+            self.menu = Menu(root, tearoff=0)
+            self.menu.add_command(label="Undo", command=self.edit_undo)
+            self.menu.add_command(label="Redo", command=self.edit_redo)
+            #self.menu.add_command(type="separator")
+            self.menu.add_command(label="Cut", command=self.cut)
+            self.menu.add_command(label="Copy", command=self.copyToClipboard)
+            self.menu.add_command(label="Paste", command=self.paste)
+            self.bind('<Control-Any-KeyPress>', self.ctrl)
+
+        self.bind('<Button-2>', self.popup) # right mouse button opens popup
         
         self.text = self
         
-        # create a popup menu    
-        self.menu = Menu(root, tearoff=0)
-        self.menu.add_command(label="Undo", command=self.edit_undo)
-        self.menu.add_command(label="Redo", command=self.edit_redo)
-        #self.menu.add_command(type="separator")
-        self.menu.add_command(label="Cut", command=self.cut)
-        self.menu.add_command(label="Copy", command=self.copyToClipboard)
-        self.menu.add_command(label="Paste", command=self.paste)
-        self.bind('<Control-Any-KeyPress>', self.ctrl)
-
-        self.bind('<Button-2>', self.popup) # right mouse button opens popup
 
     def ctrl(self, key):
         if key.keysym == 'c': self.copyToClipboard()
