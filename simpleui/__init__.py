@@ -21,9 +21,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from text import SyntaxHighlightingText, ScrolledText2
-from filePick import FilePick, FilePickEdit
-import Tkinter
+from .text import SyntaxHighlightingText, ScrolledText2
+from .filePick import FilePick, FilePickEdit
+import sys
+pyver = sys.version_info[0]
+if pyver == 2:
+    from Tkinter import OptionMenu, StringVar, Checkbutton
+else:
+    from tkinter import OptionMenu, StringVar, Checkbutton
 
 try:
     import Pmw
@@ -73,15 +78,15 @@ class DropdownList:
             self.list.component('entryfield').component('entry').configure(state = 'readonly', relief = 'raised')
             self.picked_name = self.list
         else:
-            self.picked_name = Tkinter.StringVar(self.master)
-            self.list = apply(Tkinter.OptionMenu, (self.master, self.picked_name) + tuple(items))
+            self.picked_name = StringVar(self.master)
+            self.list = apply(OptionMenu, (self.master, self.picked_name) + tuple(items))
             if self.onSelChange is not None:
                 self.picked_name.trace("w", self.onSelChange)
         if self.gridded:
             self.list.grid(**self.gridArgs)
 
 
-class Checkbox(Tkinter.Checkbutton):
+class Checkbox(Checkbutton):
     def __init__(self, master, text, default=None, **args):
         self.var = IntVar()
         Checkbutton.__init__(self, master, text=text, variable=self.var, **args)

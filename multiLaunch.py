@@ -1,11 +1,14 @@
-#!/usr/bin/python
-# -*- coding: iso-8859-1 -*-
-
-from Tkinter import *
+import sys
+pyver = sys.version_info[0]
 import os
 import pickle
 import subprocess
-from Queue import Queue
+if pyver == 2:
+    from Queue import Queue
+    from Tkinter import *
+else:
+    from queue import Queue
+    from tkinter import *
 from threading import Thread
 import time
 from output import Output
@@ -20,7 +23,7 @@ class MLProcess(object):
         self.printOutput = printOutput
 
     def start(self):
-        print "starting %s" % self.command
+        print("starting %s" % self.command)
         self.p = subprocess.Popen(self.command, shell=True, bufsize=1024*1024, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=False)
         self.stdin = self.p.stdin
         self.stdout = self.p.stdout
@@ -28,7 +31,7 @@ class MLProcess(object):
     
     def _enqueueOutput(self,stream):
         for line in iter(stream.readline, b''):
-            if self.printOutput: print "%s: %s" % (self.name, line), 
+            if self.printOutput: print("%s: %s" % (self.name, line),) 
             self.queue.put(line)
 
     def startOutputThread(self):
@@ -42,10 +45,10 @@ class MLProcess(object):
             line = self.stdout.readline()
             if line is None: 
                 break
-            #print "%s: %s" % (self.name, line),
+            #print("%s: %s" % (self.name, line),)
             l.append(line)
             i += 1
-        print l
+        print(l)
         return l
 
     def isRunning(self):
@@ -73,7 +76,7 @@ class MultiLaunch(object):
             for p in self.processes:
                 if printOutput:
                     while not p.queue.empty():
-                        print "%s: %s" (p.name, p.queue.get()), 
+                        print("%s: %s" (p.name, p.queue.get()),)
                 if p.isRunning():
                     isRunning = True
             time.sleep(2)
@@ -92,10 +95,8 @@ class MultiLaunchUI(object):
         settings = {}
         self.configname = "multiLaunch.cfg"
         if os.path.exists(self.configname):
-            try:
-                settings = pickle.loads("\n".join(map(lambda x: x.strip("\r\n"), file(self.configname, "r").readlines())))
-            except:
-                pass
+            with open(self.configname, "rb") as f:
+                settings = pickle.load(f)
 
         self.settings = settings
 
@@ -130,17 +131,17 @@ class MultiLaunchUI(object):
         self.setGeometry()
         
         self.multiLaunch.launch()
-        print "launched all processes"
+        print("launched all processes")
         
         # start threads
         for p in self.multiLaunch.processes:
             p.startOutputThread()
         
-        print "starting queue updates"
+        print("starting queue updates")
         self.updateFromQueues()
     
     def onSelectProcess(self, name):
-        print "selected %s" % name
+        print("selected %s" % name)
         self.currentProcessName = name
         p = self.procByName[name]
         self.currentProcess = p
@@ -155,14 +156,17 @@ class MultiLaunchUI(object):
     def saveSettings(self):
         self.settings["geometry"] = self.master.winfo_geometry()
         self.settings["outputLevels"] = self.logViewer.outputLevels
-        pickle.dump(self.settings, file(self.configname, "w+"))
+        with open(self.configname, "wb") as f:
+            pickle.dump(self.settings, f)
 
     def updateFromQueues(self):
         for p in self.multiLaunch.processes:
             while not p.queue.empty():
                 line = p.queue.get()
-                #print "got line: %s" %line,
-                level = p.output.appendLine(line)
+                if type(line) == bytes:
+                    line = line.decode("utf-8")
+                #print("got line: %s, %s" % (line, type(line)))
+                level = p.output.appendLine(line)                
                 #if p.name == self.currentProcessName:
                 #    self.appendOutput(line, level)
         self.master.after(500, self.updateFromQueues)

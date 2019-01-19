@@ -21,13 +21,21 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from Tkinter import *
+import sys
+pyver = sys.version_info[0]
+if pyver == 2:
+    from Tkinter import * 
+else:
+    from tkinter import * 
 havePmw = False
 try:
     from Pmw import ScrolledText
     havePmw = True
 except:
-    from ScrolledText import ScrolledText
+    if pyver == 2:
+        from ScrolledText import ScrolledText
+    else:
+        from tkinter.scrolledtext import ScrolledText
 from string import ascii_letters, digits, punctuation
 import os
 
@@ -96,7 +104,7 @@ class ScrolledText2(ScrolledText):
         pass
 
     def paste(self,event=0):
-        print "paste called"
+        #print "paste called"
         # This should call colorize for the pasted lines.
         #SelectedText = self.root.selection_get(selection='CLIPBOARD')
         cltext = self.master.clipboard_get()

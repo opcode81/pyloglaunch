@@ -1,11 +1,17 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
-
-from Tkinter import *
+ 
+import sys
+pyver = sys.version_info[0]
+if pyver == 2:
+    from Tkinter import *
+else:
+    from tkinter import *
 import os
 import pickle
 from output import Output
 from simpleui import ScrolledText2
+import logging
 
 # --- main gui class ---
 
@@ -36,7 +42,7 @@ class LogViewerUI(object):
         self.frame.columnconfigure(1, weight=1)
 
         if lines is None: lines = []
-        print "%d lines" % len(lines)
+        logging.info("%d lines" % len(lines))
         
         self.logViewer = LogViewer(self.frame, self.master, debugLevelSettings, selectedOutputLevels=self.settings.get("outputLevels"), delegate=self, initialOutputLines=lines, useClipboardButton=True)
         
@@ -76,7 +82,7 @@ class LogViewer(object):
         self.cbOutputLevel = {}
         if selectedOutputLevels is None: selectedOutputLevels = set([key for key in self.dls.levels])
         self.outputLevels = selectedOutputLevels
-        for id, name in self.dls.levels.iteritems():
+        for id, name in self.dls.levels.items():
             var = IntVar()
             cb = Checkbutton(optFrame, text=name, variable=var, command=self.onChangeOutputLevel)
             cb.pack(side=LEFT)
@@ -154,14 +160,11 @@ class LogViewer(object):
         regexes = [] if regex == "" or onlyLevel else [re.compile(regex, flags=0 if self.caseSensitiveSearch.get() else re.I)]
         text, lineIndices = self.log.get(self.outputLevels, regexes, returnOriginalLineIndices=True)
         self.filteredLineIndices = lineIndices
-        #print "Text:\n", text
         return text
     
     def locateFilteredLine(self):
-        line = map(int, self.filteredOutput.index(INSERT).split("."))[0]
-        line = line - 1
+        line = int(self.filteredOutput.index(INSERT).split(".")[0]) - 1
         originalIndex = self.filteredLineIndices[line]
-        print "original index:", originalIndex
         pos1 = "%d.0" % (originalIndex+1)
         self.output.see(pos1)  
         self.output.tag_add("hl", pos1, "%d.end" % (originalIndex+1)) # TODO FIXME: only works if all log levels are enabled      

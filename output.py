@@ -1,4 +1,5 @@
 import re
+import logging
 
 class Output(object):
     def __init__(self, recognizer, lines = None):
@@ -11,7 +12,6 @@ class Output(object):
 
     def appendLine(self, line):
         level = self.recognizer.recognize(line)
-        #print "line with level %s" % str(level) 
         self.lines.append((line, level, len(self.lines)))
         if self.observer is not None:
             self.observer.onLineAdded(line, level)
@@ -21,7 +21,7 @@ class Output(object):
         
         if regexes is None:
             regexes = []
-        regexes = map(lambda r: re.compile(r) if type(r) == str else r, regexes)
+        regexes = [re.compile(r) if type(r) == str else r for r in regexes]
         
         def match(line):
             ret = False
@@ -33,12 +33,12 @@ class Output(object):
                         break
             return ret
             
-        lines = filter(match, self.lines)
-        print "%d of %d lines match" % (len(lines), len(self.lines))
+        lines = [l for l in self.lines if match(l)]
+        logging.info("%d of %d lines match" % (len(lines), len(self.lines)))
         lineIndices = None
         if returnOriginalLineIndices:
-            lineIndices = map(lambda x: x[2], lines)
-        lines = map(lambda x: x[0], lines)
+            lineIndices = [x[2] for x in lines]
+        lines = [x[0] for x in lines]
         filteredText = "".join(lines)
         if returnOriginalLineIndices:
             return (filteredText, lineIndices)

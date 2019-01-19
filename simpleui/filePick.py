@@ -21,7 +21,12 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-from Tkinter import *
+import sys
+pyver = sys.version_info[0]
+if pyver == 2:
+    from Tkinter import *
+else:
+    from tkinter import *
 try:
     import Pmw
     havePMW = True
@@ -29,7 +34,7 @@ except:
     havePMW = False
 import os
 from fnmatch import fnmatch
-from text import SyntaxHighlightingText, ScrolledText2
+from .text import SyntaxHighlightingText, ScrolledText2
 
 class FilePickEdit(Frame):
     def reloadFile(self):
